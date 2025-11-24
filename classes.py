@@ -26,7 +26,8 @@ class Poder:
 
 class Personagem(ABC):
     @abstractmethod
-    def __init__(self, nome, descricao):
+    def __init__(self, caminho_imagem,nome, descricao):
+        self.caminho_imagem = caminho_imagem
         self.nome = nome
         self.energia = 100
         self.vida = 100
@@ -86,16 +87,16 @@ class Personagem(ABC):
 
 # As classes filhas (Guerreiro, SemiDeus, Deus) continuam herdando daqui...
 class Guerreiro(Personagem):
-    def __init__(self, nome, forca_base, descricao):
-        super().__init__(nome, descricao)
+    def __init__(self, caminho_imagem,nome, forca_base, descricao):
+        super().__init__(caminho_imagem,nome, descricao)
         self.forca_base = forca_base # Força base para ataques comuns
 
 class SemiDeus(Personagem):
-    def __init__(self, nome, forca_base, descricao):
-        super().__init__(nome, descricao)
+    def __init__(self, caminho_imagem,nome, forca_base, descricao):
+        super().__init__(caminho_imagem,nome, descricao)
         self.forca_base = forca_base
 
 class Deus(Personagem):
-    def __init__(self, nome, forca_base, descricao):
-        super().__init__(nome, descricao)
+    def __init__(self, caminho_imagem,nome, forca_base, descricao):
+        super().__init__(caminho_imagem,nome, descricao)
         self.forca_base = forca_base
