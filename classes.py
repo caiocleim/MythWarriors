@@ -10,10 +10,11 @@ class TipoEfeito(Enum):
     DANO_CONTINUO = 5  
 
 class Poder:
-    def __init__(self, nome, custo_energia, forca, tipo_efeito, duracao, descricao):
+    def __init__(self, caminho_imagem,nome, custo_energia, forca, tipo_efeito, duracao, descricao):
         """
         duracao: 0 para imediato, >0 para número de turnos, -1 para até o fim do jogo.
         """
+        self.caminho_imagem = caminho_imagem
         self.nome = nome
         self.custo_energia = custo_energia # Refere-se ao minEnergia/gasto
         self.forca = forca       # Valor do efeito (ex: 50 de dano, ou 20 de defesa extra)
@@ -42,7 +43,7 @@ class Personagem(ABC):
         # Efeitos ativos no personagem (ex: Buff de defesa ativo por 2 turnos)
         self.efeitos_ativos = [] 
 
-    def comprar_cartas(self, quantidade=3):
+    def comprar_cartas(self, quantidade=4):
         """Pega poderes aleatórios do deck e coloca na mão."""
         self.mao = random.choices(self.deck_poderes, k=quantidade)
 
