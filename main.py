@@ -201,9 +201,56 @@ class MythWarriorsApp:
             personagem.mao = []
             personagem.deck_poderes = []
 
+    def calcular_vida_HUD(self,frame_vida,frame_energia,width,jogador,jogador2):
+        jogador.vida=56
+        jogador.energia=56
+
+        se=100
+        equivale=width
+        entao=jogador.vida
+        vida_novoWidth = int((entao*equivale)/se)
+
+        entao = jogador.energia
+        energia_novoWidth = int((entao*equivale)/se)
+    
+
+        self.label_vida = tk.Frame(frame_vida,bg="red")
+        self.label_vida.place(relx=0.0,rely=0.5,anchor="w",width=vida_novoWidth,height=20)
+        txt_lbl_vida = tk.Label(self.frame_tela_inicial,text=f"{jogador.vida}%",bg="#FDEBDD")
+        txt_lbl_vida.place(relx=0.21,rely=0.809,anchor="center")
+
+        self.label_energia = tk.Frame(frame_energia,bg="green")
+        self.label_energia.place(relx=0.0,rely=0.5,anchor="w",width=energia_novoWidth,height=20)
+        txt_lbl_vida = tk.Label(self.frame_tela_inicial,text=f"{jogador.energia}%",bg="#FDEBDD")
+        txt_lbl_vida.place(relx=0.21,rely=0.881,anchor="center")
+
+        #jogador2
+        jogador2.vida=20
+        jogador2.energia=20
+
+        entao = jogador2.vida
+        vida_novoWidth = int((entao*equivale)/se)
+
+        entao = jogador2.energia
+        energia_novoWidth = int((entao*equivale)/se)
+
+        self.label_vida2 = tk.Frame(frame_vida,bg="red")
+        self.label_vida2.place(relx=0.0,rely=0.5,anchor="w",width=vida_novoWidth,height=20)
+        txt_lbl_vida = tk.Label(self.frame_tela_inicial,text=f"{jogador.vida}%",bg="#FDEBDD")
+        txt_lbl_vida.place(relx=0.21,rely=0.809,anchor="center")
+
+        self.label_energia2 = tk.Frame(frame_energia,bg="green")
+        self.label_energia2.place(relx=0.0,rely=0.5,anchor="w",width=energia_novoWidth,height=20)
+        txt_lbl_vida = tk.Label(self.frame_tela_inicial,text=f"{jogador.energia}%",bg="#FDEBDD")
+        txt_lbl_vida.place(relx=0.21,rely=0.881,anchor="center")
+
+
     def carrega_HUD(self):
         #carrega as os frames
         #personagem jogador um
+        width_barra=120
+        height_barra=20
+
         hud1 = tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=260,height=160)
         hud1.place(relx=0,rely=0.76)
 
@@ -213,11 +260,16 @@ class MythWarriorsApp:
         txt_vida = tk.Label(hud1,text="Vida:",font=("Arial",10,"bold"),bg="#FDEBDD")
         txt_vida.place(relx=0.5,rely=0.2,anchor="center")
 
+        #vida do jogador 1
+        fr_barra_vida = tk.Frame(hud1,bg="white",width=width_barra,height=height_barra)
+        fr_barra_vida.place(relx=0.67,rely=0.34,anchor="center")
+
         txt_energia = tk.Label(hud1,text="Energia:",font=("Arial",10,"bold"),bg="#FDEBDD")
         txt_energia.place(relx=0.55,rely=0.5,anchor="center")
 
-        
-        
+        fr_barra_energia = tk.Frame(hud1,bg="white",width=width_barra,height=height_barra)
+        fr_barra_energia.place(relx=0.67,rely=0.65,anchor="center")
+
 
 
         #hud de cartas jogador 1
@@ -244,8 +296,18 @@ class MythWarriorsApp:
         txt_vida2 = tk.Label(hud2,text="Vida:",font=("Arial",10,"bold"),bg="#FDEBDD")
         txt_vida2.place(relx=0.5,rely=0.2,anchor="center")
 
+        fr_barra_vida2 = tk.Frame(hud2,bg="white",width=width_barra,height=height_barra)
+        fr_barra_vida2.place(relx=0.67,rely=0.34,anchor="center")
+
+
         txt_energia2 = tk.Label(hud2,text="Energia:",font=("Arial",10,"bold"),bg="#FDEBDD")
         txt_energia2.place(relx=0.55,rely=0.5,anchor="center")
+
+        fr_barra_energia2 = tk.Frame(hud2,bg="white",width=width_barra,height=height_barra)
+        fr_barra_energia2.place(relx=0.67,rely=0.65,anchor="center")
+
+
+        self.calcular_vida_HUD(fr_barra_vida,fr_barra_energia,width_barra,self.jogador,self.computador)
 
         #imagem do jogador um
         img_deus_jogador = Image.open(self.jogador.caminho_imagem)
@@ -269,6 +331,7 @@ class MythWarriorsApp:
 
         self.fr_cartas_j1 = []
         self.lbl_cartas_j1 = []
+        self.btn_carta=[]
 
         #ataque comum
         self.fr_cartas_j1.append(tk.Frame(fr_cartaAtk_comum,bg="white",width=115,height=145))
@@ -276,6 +339,8 @@ class MythWarriorsApp:
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[0],bg=self.fr_cartas_j1[0]["bg"],width=115,height=145))
         self.lbl_cartas_j1[0].place(relx=0.5,rely=0.5,anchor="center")
         self.importar_carta(0,self.jogador)
+        self.btn_carta.append(tk.Button(self.fr_cartas_j1[0],text=f"F:{self.jogador.mao[0].forca}"))
+        self.btn_carta[0].place(relx=0.5,rely=0.89,anchor="center")
 
         #cartas magica
         self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica,bg="white",width=115,height=145))
@@ -283,18 +348,24 @@ class MythWarriorsApp:
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[1],bg=self.fr_cartas_j1[1]["bg"],width=115,height=145))
         self.lbl_cartas_j1[1].place(relx=0.5,rely=0.5,anchor="center")
         self.importar_carta(1,self.jogador)
+        self.btn_carta.append(tk.Button(self.fr_cartas_j1[1],text=f"F:{self.jogador.mao[1].forca}"))
+        self.btn_carta[1].place(relx=0.5,rely=0.89,anchor="center")
 
         self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica,bg="white",width=115,height=145))
         self.fr_cartas_j1[2].place(relx=0.5,rely=0.5,anchor="center")
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[2],bg=self.fr_cartas_j1[2]["bg"],width=115,height=145))
         self.lbl_cartas_j1[2].place(relx=0.5,rely=0.5,anchor="center")
         self.importar_carta(2,self.jogador)
+        self.btn_carta.append(tk.Button(self.fr_cartas_j1[2],text=f"F:{self.jogador.mao[2].forca}"))
+        self.btn_carta[2].place(relx=0.5,rely=0.89,anchor="center")
 
         self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica,bg="white",width=115,height=145))
         self.fr_cartas_j1[3].place(relx=0.8,rely=0.5,anchor="center")
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[3],bg=self.fr_cartas_j1[3]["bg"],width=115,height=145))
         self.lbl_cartas_j1[3].place(relx=0.5,rely=0.5,anchor="center")
         self.importar_carta(3,self.jogador)
+        self.btn_carta.append(tk.Button(self.fr_cartas_j1[3],text=f"F:{self.jogador.mao[3].forca}"))
+        self.btn_carta[3].place(relx=0.5,rely=0.89,anchor="center")
 
     def importar_carta(self,label,player):
         #aqui está a configuração do background do menun inicial
