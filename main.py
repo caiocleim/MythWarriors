@@ -201,7 +201,7 @@ class MythWarriorsApp:
             personagem.mao = []
             personagem.deck_poderes = []
 
-    def calcular_vida_HUD(self,frame_vida,frame_energia,width,jogador,jogador2):
+    def calcular_vida_HUD(self,frame_vida,frame_energia,width,jogador,i):
         jogador.vida=56
         jogador.energia=56
 
@@ -216,33 +216,13 @@ class MythWarriorsApp:
 
         self.label_vida = tk.Frame(frame_vida,bg="red")
         self.label_vida.place(relx=0.0,rely=0.5,anchor="w",width=vida_novoWidth,height=20)
-        txt_lbl_vida = tk.Label(self.frame_tela_inicial,text=f"{jogador.vida}%",bg="#FDEBDD")
-        txt_lbl_vida.place(relx=0.21,rely=0.809,anchor="center")
+        txt_lbl_vida = tk.Label(self.hud[i],text=f"{jogador.vida}%",bg="#FDEBDD")
+        txt_lbl_vida.place(relx=0.8,rely=0.2,anchor="center")
 
         self.label_energia = tk.Frame(frame_energia,bg="green")
         self.label_energia.place(relx=0.0,rely=0.5,anchor="w",width=energia_novoWidth,height=20)
-        txt_lbl_vida = tk.Label(self.frame_tela_inicial,text=f"{jogador.energia}%",bg="#FDEBDD")
-        txt_lbl_vida.place(relx=0.21,rely=0.881,anchor="center")
-
-        #jogador2
-        jogador2.vida=20
-        jogador2.energia=20
-
-        entao = jogador2.vida
-        vida_novoWidth = int((entao*equivale)/se)
-
-        entao = jogador2.energia
-        energia_novoWidth = int((entao*equivale)/se)
-
-        self.label_vida2 = tk.Frame(frame_vida,bg="red")
-        self.label_vida2.place(relx=0.0,rely=0.5,anchor="w",width=vida_novoWidth,height=20)
-        txt_lbl_vida = tk.Label(self.frame_tela_inicial,text=f"{jogador.vida}%",bg="#FDEBDD")
-        txt_lbl_vida.place(relx=0.21,rely=0.809,anchor="center")
-
-        self.label_energia2 = tk.Frame(frame_energia,bg="green")
-        self.label_energia2.place(relx=0.0,rely=0.5,anchor="w",width=energia_novoWidth,height=20)
-        txt_lbl_vida = tk.Label(self.frame_tela_inicial,text=f"{jogador.energia}%",bg="#FDEBDD")
-        txt_lbl_vida.place(relx=0.21,rely=0.881,anchor="center")
+        txt_lbl_vida = tk.Label(self.hud[i],text=f"{jogador.energia}%",bg="#FDEBDD")
+        txt_lbl_vida.place(relx=0.8,rely=0.5,anchor="center")
 
 
     def carrega_HUD(self):
@@ -251,81 +231,98 @@ class MythWarriorsApp:
         width_barra=120
         height_barra=20
 
-        hud1 = tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=260,height=160)
-        hud1.place(relx=0,rely=0.76)
+        self.hud=[]
+        txt_nome=[]
+        txt_vida=[]
+        fr_barra_vida=[]
+        fr_barra_energia=[]
+        txt_energia=[]
 
-        txt_nome = tk.Label(hud1,text=f"{self.jogador.nome}",font=("Arial",10,"bold"),bg="#FDEBDD")
-        txt_nome.place(relx=0.5,rely=0.05,anchor="center")
+        self.hud.append(tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=260,height=160))
+        self.hud[0].place(relx=0,rely=0.76)
 
-        txt_vida = tk.Label(hud1,text="Vida:",font=("Arial",10,"bold"),bg="#FDEBDD")
-        txt_vida.place(relx=0.5,rely=0.2,anchor="center")
+        txt_nome.append(tk.Label(self.hud[0],text=f"{self.jogador.nome}",font=("Arial",10,"bold"),bg="#FDEBDD"))
+        txt_nome[0].place(relx=0.5,rely=0.05,anchor="center")
+
+        txt_vida.append (tk.Label(self.hud[0],text="Vida:",font=("Arial",10,"bold"),bg="#FDEBDD"))
+        txt_vida[0].place(relx=0.5,rely=0.2,anchor="center")
 
         #vida do jogador 1
-        fr_barra_vida = tk.Frame(hud1,bg="white",width=width_barra,height=height_barra)
-        fr_barra_vida.place(relx=0.67,rely=0.34,anchor="center")
+        fr_barra_vida.append(tk.Frame(self.hud[0],bg="white",width=width_barra,height=height_barra))
+        fr_barra_vida[0].place(relx=0.67,rely=0.34,anchor="center")
 
-        txt_energia = tk.Label(hud1,text="Energia:",font=("Arial",10,"bold"),bg="#FDEBDD")
-        txt_energia.place(relx=0.55,rely=0.5,anchor="center")
+        txt_energia.append(tk.Label(self.hud[0],text="Energia:",font=("Arial",10,"bold"),bg="#FDEBDD"))
+        txt_energia[0].place(relx=0.55,rely=0.5,anchor="center")
 
-        fr_barra_energia = tk.Frame(hud1,bg="white",width=width_barra,height=height_barra)
-        fr_barra_energia.place(relx=0.67,rely=0.65,anchor="center")
+        fr_barra_energia.append(tk.Frame(self.hud[0],bg="white",width=width_barra,height=height_barra))
+        fr_barra_energia[0].place(relx=0.67,rely=0.65,anchor="center")
 
 
 
         #hud de cartas jogador 1
+        fr_cartaAtk_comum=[]
+        fr_cartaMagica=[]
+        txt_cartaAtk_comum=[]
+        txt_cartaMagica=[]
+        
+        fr_cartaAtk_comum.append(tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=140,height=171))
+        fr_cartaAtk_comum[0].place(x=350,rely=0.89,anchor="center")
 
-        fr_cartaAtk_comum = tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=140,height=171)
-        fr_cartaAtk_comum.place(x=350,rely=0.89,anchor="center")
+        fr_cartaMagica.append(tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=400,height=171))
+        fr_cartaMagica[0].place(x=650,rely=0.89,anchor="center")
 
-        fr_cartaMagica = tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=400,height=171)
-        fr_cartaMagica.place(x=650,rely=0.89,anchor="center")
+        txt_cartaAtk_comum.append(tk.Label(fr_cartaAtk_comum[0],text="Ataque Comum",bg="#FDEBDD",font=("Arial",9,"bold")))
+        txt_cartaAtk_comum[0].place(relx=0.5,rely=0.03,anchor="center")
 
-        txt_cartaAtk_comum = tk.Label(fr_cartaAtk_comum,text="Ataque Comum",bg="#FDEBDD",font=("Arial",9,"bold"))
-        txt_cartaAtk_comum.place(relx=0.5,rely=0.03,anchor="center")
-
-        txt_cartaMagica = tk.Label(fr_cartaMagica,text="Cartas de Magia",bg="#FDEBDD",font=("Arial",9,"bold"))
-        txt_cartaMagica.place(relx=0.5,rely=0.03,anchor="center")
+        txt_cartaMagica.append(tk.Label(fr_cartaMagica[0],text="Cartas de Magia",bg="#FDEBDD",font=("Arial",9,"bold")))
+        txt_cartaMagica[0].place(relx=0.5,rely=0.03,anchor="center")
 
         #personagem jogador dois
-        hud2 = tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=260,height=160)
-        hud2.place(relx=0.76,rely=0)
+        self.hud.append(tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=260,height=160))
+        self.hud[1].place(relx=0.76,rely=0)
 
-        txt_nome2 = tk.Label(hud2,text=f"{self.computador.nome}",font=("Arial",10,"bold"),bg="#FDEBDD")
-        txt_nome2.place(relx=0.5,rely=0.05,anchor="center")
+        txt_nome.append(tk.Label(self.hud[1],text=f"{self.computador.nome}",font=("Arial",10,"bold"),bg="#FDEBDD"))
+        txt_nome[1].place(relx=0.5,rely=0.05,anchor="center")
 
-        txt_vida2 = tk.Label(hud2,text="Vida:",font=("Arial",10,"bold"),bg="#FDEBDD")
-        txt_vida2.place(relx=0.5,rely=0.2,anchor="center")
+        txt_vida.append(tk.Label(self.hud[1],text="Vida:",font=("Arial",10,"bold"),bg="#FDEBDD"))
+        txt_vida[1].place(relx=0.5,rely=0.2,anchor="center")
 
-        fr_barra_vida2 = tk.Frame(hud2,bg="white",width=width_barra,height=height_barra)
-        fr_barra_vida2.place(relx=0.67,rely=0.34,anchor="center")
-
-
-        txt_energia2 = tk.Label(hud2,text="Energia:",font=("Arial",10,"bold"),bg="#FDEBDD")
-        txt_energia2.place(relx=0.55,rely=0.5,anchor="center")
-
-        fr_barra_energia2 = tk.Frame(hud2,bg="white",width=width_barra,height=height_barra)
-        fr_barra_energia2.place(relx=0.67,rely=0.65,anchor="center")
+        fr_barra_vida.append(tk.Frame(self.hud[1],bg="white",width=width_barra,height=height_barra))
+        fr_barra_vida[1].place(relx=0.67,rely=0.34,anchor="center")
 
 
-        self.calcular_vida_HUD(fr_barra_vida,fr_barra_energia,width_barra,self.jogador,self.computador)
+        txt_energia.append(tk.Label(self.hud[1],text="Energia:",font=("Arial",10,"bold"),bg="#FDEBDD"))
+        txt_energia[1].place(relx=0.55,rely=0.5,anchor="center")
 
-        #imagem do jogador um
-        img_deus_jogador = Image.open(self.jogador.caminho_imagem)
-        img_deus_jogador = img_deus_jogador.resize((100,100))
-        img_deus_jogador_tk = ImageTk.PhotoImage(img_deus_jogador)
+        fr_barra_energia.append(tk.Frame(self.hud[1],bg="white",width=width_barra,height=height_barra))
+        fr_barra_energia[1].place(relx=0.67,rely=0.65,anchor="center")
 
-        label_img_jogador = tk.Label(hud1,image=img_deus_jogador_tk)
-        label_img_jogador.image = img_deus_jogador_tk
-        label_img_jogador.place(relx=0.2,rely=0.45,anchor="center")
+
+        self.calcular_vida_HUD(fr_barra_vida[0],fr_barra_energia[0],width_barra,self.jogador,0)
+
+        img_deus_jogador = []
+        img_deus_jogador_tk=[]
+        label_img_jogador=[]
 
         #imagem do jogador um
-        img_deus_jogador_dois = Image.open(self.computador.caminho_imagem)
-        img_deus_jogador_dois = img_deus_jogador_dois.resize((100,100))
-        img_deus_jogador_dois_tk = ImageTk.PhotoImage(img_deus_jogador_dois)
+        img_deus_jogador.append(Image.open(self.jogador.caminho_imagem))
+        img_deus_jogador[0] = img_deus_jogador[0].resize((100,100))
+        img_deus_jogador_tk.append(ImageTk.PhotoImage(img_deus_jogador[0]))
 
-        label_img_jogador_dois = tk.Label(hud2,image=img_deus_jogador_dois_tk)
-        label_img_jogador_dois.image = img_deus_jogador_dois_tk
-        label_img_jogador_dois.place(relx=0.2,rely=0.45,anchor="center")
+        label_img_jogador.append(tk.Label(self.hud[0],image=img_deus_jogador_tk[0]))
+        label_img_jogador[0].image = img_deus_jogador_tk[0]
+        label_img_jogador[0].place(relx=0.2,rely=0.45,anchor="center")
+
+        #imagem do jogador um
+        img_deus_jogador.append(Image.open(self.computador.caminho_imagem))
+        img_deus_jogador[1] = img_deus_jogador[1].resize((100,100))
+        img_deus_jogador_tk.append(ImageTk.PhotoImage(img_deus_jogador[1]))
+
+        label_img_jogador.append(tk.Label(self.hud[1],image=img_deus_jogador_tk[1]))
+        label_img_jogador[1].image = img_deus_jogador_tk[1]
+        label_img_jogador[1].place(relx=0.2,rely=0.45,anchor="center")
+
+        self.calcular_vida_HUD(fr_barra_vida[1],fr_barra_energia[1],width_barra,self.computador,1)
 
         #cartas
 
@@ -334,7 +331,7 @@ class MythWarriorsApp:
         self.btn_carta=[]
 
         #ataque comum
-        self.fr_cartas_j1.append(tk.Frame(fr_cartaAtk_comum,bg="white",width=115,height=145))
+        self.fr_cartas_j1.append(tk.Frame(fr_cartaAtk_comum[0],bg="white",width=115,height=145))
         self.fr_cartas_j1[0].place(relx=0.5,rely=0.5,anchor="center")
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[0],bg=self.fr_cartas_j1[0]["bg"],width=115,height=145))
         self.lbl_cartas_j1[0].place(relx=0.5,rely=0.5,anchor="center")
@@ -343,7 +340,7 @@ class MythWarriorsApp:
         self.btn_carta[0].place(relx=0.5,rely=0.89,anchor="center")
 
         #cartas magica
-        self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica,bg="white",width=115,height=145))
+        self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica[0],bg="white",width=115,height=145))
         self.fr_cartas_j1[1].place(relx=0.2,rely=0.5,anchor="center")
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[1],bg=self.fr_cartas_j1[1]["bg"],width=115,height=145))
         self.lbl_cartas_j1[1].place(relx=0.5,rely=0.5,anchor="center")
@@ -351,7 +348,7 @@ class MythWarriorsApp:
         self.btn_carta.append(tk.Button(self.fr_cartas_j1[1],text=f"F:{self.jogador.mao[1].forca}"))
         self.btn_carta[1].place(relx=0.5,rely=0.89,anchor="center")
 
-        self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica,bg="white",width=115,height=145))
+        self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica[0],bg="white",width=115,height=145))
         self.fr_cartas_j1[2].place(relx=0.5,rely=0.5,anchor="center")
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[2],bg=self.fr_cartas_j1[2]["bg"],width=115,height=145))
         self.lbl_cartas_j1[2].place(relx=0.5,rely=0.5,anchor="center")
@@ -359,7 +356,7 @@ class MythWarriorsApp:
         self.btn_carta.append(tk.Button(self.fr_cartas_j1[2],text=f"F:{self.jogador.mao[2].forca}"))
         self.btn_carta[2].place(relx=0.5,rely=0.89,anchor="center")
 
-        self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica,bg="white",width=115,height=145))
+        self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica[0],bg="white",width=115,height=145))
         self.fr_cartas_j1[3].place(relx=0.8,rely=0.5,anchor="center")
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[3],bg=self.fr_cartas_j1[3]["bg"],width=115,height=145))
         self.lbl_cartas_j1[3].place(relx=0.5,rely=0.5,anchor="center")
