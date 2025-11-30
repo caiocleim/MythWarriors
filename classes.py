@@ -38,6 +38,7 @@ class Personagem(ABC):
         self.deck_poderes = [] 
         
         # Mão atual (cartas disponíveis no turno)
+        self.ataque_comum=None
         self.mao = []
 
         self.carta_utilizada = None
@@ -45,9 +46,11 @@ class Personagem(ABC):
         # Efeitos ativos no personagem (ex: Buff de defesa ativo por 2 turnos)
         self.efeitos_ativos = [] 
 
-    def comprar_cartas(self, quantidade=4):
-        """Pega poderes aleatórios do deck e coloca na mão."""
-        self.mao = random.choices(self.deck_poderes, k=quantidade)
+    def comprar_cartas(self, quantidade=3):
+        self.ataque_comum=random.choice(self.deck_poderes)
+        self.mao = random.choices(self.deck_poderes,k=quantidade)
+
+
 
     def aplicar_efeitos_inicio_turno(self):
         """

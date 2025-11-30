@@ -198,6 +198,7 @@ class MythWarriorsApp:
             personagem.vida = 100
             personagem.energia = 100
             personagem.efeitos_ativos = []
+            personagem.ataque_comum=None
             personagem.mao = []
             personagem.deck_poderes = []
 
@@ -336,50 +337,77 @@ class MythWarriorsApp:
 
         self.calcular_vida_HUD(fr_barra_vida[1],fr_barra_energia[1],width_barra,self.computador,1)
 
-        #cartas
+                # --- CARTAS (adaptado: usa self.jogador) ---
+        # carregar imagem 'vazia' (ideal carregar uma vez em __init__)
+        if not hasattr(self, "img_vazia"):
+            try:
+                img_vazia_pil = Image.open("images/vazio.png").resize((115,145))
+                self.img_vazia = ImageTk.PhotoImage(img_vazia_pil)
+            except Exception:
+                self.img_vazia = ImageTk.PhotoImage(Image.new("RGBA", (115,145), (200,200,200,255)))
 
+        # criar 4 slots/frame sempre
         self.fr_cartas_j1 = []
-        self.lbl_cartas_j1 = []
-        self.btn_carta=[]
+        self.lbl_cartas_j1 = [None, None, None, None]
+        self.btn_carta = [None, None, None, None]
+        pos_relx = [0.5, 0.2, 0.5, 0.8]
 
-        #ataque comum
-        self.fr_cartas_j1.append(tk.Frame(fr_cartaAtk_comum[0],bg="white",width=115,height=145))
-        self.fr_cartas_j1[0].place(relx=0.5,rely=0.5,anchor="center")
-        self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[0],bg=self.fr_cartas_j1[0]["bg"],width=115,height=145))
-        self.lbl_cartas_j1[0].place(relx=0.5,rely=0.5,anchor="center")
+        for i in range(4):
+            parent = fr_cartaAtk_comum[0] if i == 0 else fr_cartaMagica[0]
+            fr = tk.Frame(parent, bg="white", width=115, height=145)
+            fr.place(relx=pos_relx[i], rely=0.5, anchor="center")
+            self.fr_cartas_j1.append(fr)
 
-        self.importar_carta(0,self.jogador)
-        self.btn_carta.append(tk.Button(self.fr_cartas_j1[0],text=f"F:{self.jogador.mao[0].forca}"))
-        self.btn_carta[0].place(relx=0.5,rely=0.89,anchor="center")
-        
-        #cartas magica
+        def safe_destroy(obj):
+            try:
+                if obj is not None:
+                    obj.destroy()
+            except Exception:
+                pass
 
-        self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica[0],bg="white",width=115,height=145))
-        self.fr_cartas_j1[1].place(relx=0.2,rely=0.5,anchor="center")
-        self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[1],bg=self.fr_cartas_j1[1]["bg"],width=115,height=145))
-        self.lbl_cartas_j1[1].place(relx=0.5,rely=0.5,anchor="center")
+        # pegar do jogador (corrigido)
+        ataque = getattr(self.jogador, "ataque_comum", None)
+        mao = getattr(self.jogador, "mao", [])
 
-        self.importar_carta(1,self.jogador)
-        self.btn_carta.append(tk.Button(self.fr_cartas_j1[1],text=f"F:{self.jogador.mao[1].forca}"))
-        self.btn_carta[1].place(relx=0.5,rely=0.89,anchor="center")
+        for i in range(4):
+            safe_destroy(self.lbl_cartas_j1[i])
+            safe_destroy(self.btn_carta[i])
+            self.lbl_cartas_j1[i] = None
+            self.btn_carta[i] = None
 
-        self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica[0],bg="white",width=115,height=145))
-        self.fr_cartas_j1[2].place(relx=0.5,rely=0.5,anchor="center")
-        self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[2],bg=self.fr_cartas_j1[2]["bg"],width=115,height=145))
-        self.lbl_cartas_j1[2].place(relx=0.5,rely=0.5,anchor="center")
+            if i == 0:
+                carta = ataque
+            else:
+                idx = i - 1
+                carta = mao[idx] if idx < len(mao) else None
 
-        self.importar_carta(2,self.jogador)
-        self.btn_carta.append(tk.Button(self.fr_cartas_j1[2],text=f"F:{self.jogador.mao[2].forca}"))
-        self.btn_carta[2].place(relx=0.5,rely=0.89,anchor="center")
+            if carta is not None:
+                lbl = tk.Label(self.fr_cartas_j1[i], width=115, height=145, bg=self.fr_cartas_j1[i]["bg"])
+                lbl.place(relx=0.5, rely=0.5, anchor="center")
+                self.lbl_cartas_j1[i] = lbl
 
-        self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica[0],bg="white",width=115,height=145))
-        self.fr_cartas_j1[3].place(relx=0.8,rely=0.5,anchor="center")
-        self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[3],bg=self.fr_cartas_j1[3]["bg"],width=115,height=145))
-        self.lbl_cartas_j1[3].place(relx=0.5,rely=0.5,anchor="center")
+                try:
+                    pil = Image.open(carta.caminho_imagem).resize((115,145))
+                    img_tk = ImageTk.PhotoImage(pil)
+                except Exception:
+                    img_tk = self.img_vazia
 
-        self.importar_carta(3,self.jogador)
-        self.btn_carta.append(tk.Button(self.fr_cartas_j1[3],text=f"F:{self.jogador.mao[3].forca}"))
-        self.btn_carta[3].place(relx=0.5,rely=0.89,anchor="center")
+                lbl.configure(image=img_tk)
+                lbl.image = img_tk
+
+                forca_text = f"F:{getattr(carta, 'forca', '?')}"
+                btn = tk.Button(self.fr_cartas_j1[i], text=forca_text, command=lambda i=i: self.utilizar_carta_magica(i))
+                btn.place(relx=0.5, rely=0.89, anchor="center")
+                self.btn_carta[i] = btn
+            else:
+                lbl = tk.Label(self.fr_cartas_j1[i], image=self.img_vazia, width=115, height=145, bg=self.fr_cartas_j1[i]["bg"])
+                lbl.image = self.img_vazia
+                lbl.place(relx=0.5, rely=0.5, anchor="center")
+                self.lbl_cartas_j1[i] = lbl
+        # --- FIM CARTAS ---
+
+
+
 
         #carta utilizada
         self.cartas_utilizadas=[]
@@ -411,14 +439,49 @@ class MythWarriorsApp:
         bg.place(relx=0.5,rely=0.5,anchor="center")
 
     def importar_carta(self,label,player):
-        #aqui está a configuração do background do menun inicial
-        img_carta = Image.open(f"{player.mao[label].caminho_imagem}")
-        img_carta = img_carta.resize((115,145))
-        img_tk = ImageTk.PhotoImage(img_carta)
 
-        bg = tk.Label(self.lbl_cartas_j1[label],image=img_tk)
-        bg.image = img_tk
-        bg.place(relx=0.5,rely=0.5,anchor="center")
+        # garante imagem padrão já carregada
+        if not hasattr(self, "img_vazia"):
+            try:
+                img = Image.open("images/vazio.png").resize((115,145))
+                self.img_vazia = ImageTk.PhotoImage(img)
+            except Exception:
+                # fallback simples: cria uma imagem vazia 115x145
+                self.img_vazia = ImageTk.PhotoImage(Image.new("RGBA", (115,145), (200,200,200,255)))
+
+        # garante que o slot de label exista (cria se não existir)
+        while len(self.lbl_cartas_j1) <= label:
+            self.lbl_cartas_j1.append(None)
+
+        if self.lbl_cartas_j1[label] is None:
+            lbl = tk.Label(self.fr_cartas_j1[label], width=115, height=145, bg=self.fr_cartas_j1[label]["bg"])
+            lbl.place(relx=0.5, rely=0.5, anchor="center")
+            self.lbl_cartas_j1[label] = lbl
+        else:
+            lbl = self.lbl_cartas_j1[label]
+
+        # se a carta não existe, mostra imagem 'vazia'
+        carta = None
+        if label < len(getattr(player, "mao", [])):
+            carta = player.mao[label]
+
+        if carta is None:
+            lbl.configure(image=self.img_vazia)
+            lbl.image = self.img_vazia
+            return
+
+        # se chegou aqui, carta existe — carrega imagem da carta
+        try:
+            img_carta = Image.open(f"{carta.caminho_imagem}")
+            img_carta = img_carta.resize((115,145))
+            img_tk = ImageTk.PhotoImage(img_carta)
+        except Exception:
+            # se algo falhar, usa a imagem vazia como fallback
+            img_tk = self.img_vazia
+
+        lbl.configure(image=img_tk)
+        lbl.image = img_tk
+
 
     def carregar_tabuleiro(self):
         #carrega o background do tabuleiro
@@ -447,13 +510,86 @@ class MythWarriorsApp:
         txt_lbl_narracao = tk.Label(self.fr_narracao,bg="white",text=txt_narracao,font=("Arial",12,"bold"))
         txt_lbl_narracao.place(relx=0.5,rely=0.5,anchor="center")
 
+    def utilizar_carta_magica(self, slot_index):
+        """
+        Usa a carta do slot (0 = ataque_comum, 1..3 = mao[0..2]).
+        Marca carta como utilizada em self.jogador.carta_utilizada,
+        aplica um efeito simples (dano/cura/buff) e atualiza HUD.
+        """
+        # obter carta do jogador (corrigido)
+        if slot_index == 0:
+            carta = getattr(self.jogador, "ataque_comum", None)
+        else:
+            idx = slot_index - 1
+            mao = getattr(self.jogador, "mao", [])
+            carta = mao[idx] if idx < len(mao) else None
+
+        if carta is None:
+            self.exibir_narracao("Nenhuma carta nesse slot.")
+            return
+
+        # marcar carta utilizada no jogador (USAR self.jogador, não self)
+        self.jogador.carta_utilizada = carta
+
+        # exemplo de aplicação de efeito (ajuste conforme seu TipoEfeito)
+        tipo = getattr(carta, "tipo_efeito", None)
+        try:
+            nome_tipo = tipo.name
+        except Exception:
+            nome_tipo = str(tipo)
+
+        if nome_tipo in ("DANO_IMEDIATO", "DANO_CONTINUO"):
+            dano = getattr(carta, "forca", 0)
+            self.computador.vida = max(0, getattr(self.computador, "vida", 0) - dano)
+            self.exibir_narracao(f"{self.jogador.nome} usou {carta.nome}: causou {dano} de dano.")
+        elif nome_tipo == "CURA":
+            cura = getattr(carta, "forca", 0)
+            self.jogador.vida = min(100, getattr(self.jogador, "vida", 0) + cura)
+            self.exibir_narracao(f"{self.jogador.nome} usou {carta.nome}: curou {cura} HP.")
+        elif nome_tipo == "BUFF_DEFESA":
+            self.jogador.adicionar_efeito(carta)
+            self.exibir_narracao(f"{self.jogador.nome} ativou {carta.nome}.")
+        else:
+            # fallback
+            dano = getattr(carta, "forca", 0)
+            if dano:
+                self.computador.vida = max(0, getattr(self.computador, "vida", 0) - dano)
+                self.exibir_narracao(f"{self.jogador.nome} usou {carta.nome}: -{dano} HP.")
+            else:
+                self.exibir_narracao(f"{self.jogador.nome} usou {carta.nome}.")
+
+        # limpar slot após uso
+        if slot_index == 0:
+            self.jogador.ataque_comum = None
+        else:
+            idx = slot_index - 1
+            if idx < len(self.jogador.mao):
+                self.jogador.mao[idx] = None
+
+        # atualizar HUD e checar fim de jogo
+        self.carrega_HUD()
+        if getattr(self.computador, "vida", 1) <= 0:
+            self.exibir_narracao("Vitória! O computador foi derrotado.")
+            self.acabouJogo = True
+
+
+
+    def pular_turno(self):
+        self.turno_atual+=1
 
     def iniciarJogo(self,personagem_escolhido):
+
+        #variaveis de controle
+        self.acabouJogo=False
+        self.turno_atual=1
+
+
         self.jogador = personagem_escolhido
 
         self.lista_personagens = characters.deus + characters.guerreiros + characters.semideus
         self.resetar_todos_personagens()
         self.configurar_decks()
+
         
         #remove o jogador da lista de opções do computador
         for p in self.lista_personagens:
@@ -465,30 +601,36 @@ class MythWarriorsApp:
         #configurar primeira mao
         self.jogador.comprar_cartas()
         self.computador.comprar_cartas()
-
+        
         #fluxo principal do jogo
 
+        
 
-        self.redefinir()
-        self.carregar_tabuleiro()
         #carrega hud dos jogadores
 
-        self.exibir_narracao("Começou o Jogo - 1º Turno (Vez do Jogador 1)")
+        while self.acabouJogo == False:
+            # reseta a variável antes de esperar
+            self.botao_pressionado.set(False)
 
-        self.fr_narracao.after(1000, lambda: self.exibir_narracao(" - "))
+            self.redefinir()
+            self.carregar_tabuleiro()
+            self.carrega_HUD()
 
+            self.exibir_narracao(f"Turno {self.turno_atual}")
 
-        self.jogador.carta_utilizada = self.jogador.mao[2]
-        self.computador.carta_utilizada = self.computador.mao[0]
+            def on_pular():
+                self.pular_turno()              # incrementa turno
+                self.botao_pressionado.set(True)  # libera wait_variable
 
+            btn_pular_turno = tk.Button(self.frame_tela_inicial, text="Pular Turno", command=on_pular)
+            btn_pular_turno.place(x=854, y=520, width=140, height=30)
 
-        self.carrega_HUD()
+            btn_comprar_carta = tk.Button(self.frame_tela_inicial, text="Comprar Cartas(1)")
+            btn_comprar_carta.place(x=854, y=565, width=140, height=30)
 
-        btn_pular_turno = tk.Button(self.frame_tela_inicial,text="Pular Turno")
-        btn_pular_turno.place(x=854,y=520,width=140,height=30)
+            root.wait_variable(self.botao_pressionado)
+            # aqui, o usuário clicou (on_pular executou) e o loop recomeça (mostra próximo turno)
 
-        btn_comprar_carta = tk.Button(self.frame_tela_inicial,text="Comprar Cartas(1)")
-        btn_comprar_carta.place(x=854,y=565,width=140,height=30)
 
 
 
