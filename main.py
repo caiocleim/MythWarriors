@@ -202,9 +202,6 @@ class MythWarriorsApp:
             personagem.deck_poderes = []
 
     def calcular_vida_HUD(self,frame_vida,frame_energia,width,jogador,i):
-        jogador.vida=56
-        jogador.energia=56
-
         se=100
         equivale=width
         entao=jogador.vida
@@ -226,6 +223,7 @@ class MythWarriorsApp:
 
 
     def carrega_HUD(self):
+
         #carrega as os frames
         #personagem jogador um
         width_barra=120
@@ -264,7 +262,21 @@ class MythWarriorsApp:
         fr_cartaMagica=[]
         txt_cartaAtk_comum=[]
         txt_cartaMagica=[]
-        
+
+        fr_carta_usada =[]
+        txt_descricao=[]
+
+        fr_carta_usada.append(tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=140,height=171))
+        fr_carta_usada[0].place(x=280,y=300)
+        txt_descricao.append(tk.Label(fr_carta_usada[0],text="Carta Utilizada",bg="#FDEBDD",font=("Arial",9,"bold")))
+        txt_descricao[0].place(relx=0.5,rely=0.03,anchor="center")
+
+        fr_carta_usada.append(tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=140,height=171))
+        fr_carta_usada[1].place(x=600,y=90)
+        txt_descricao.append(tk.Label(fr_carta_usada[1],text="Carta Utilizada",bg="#FDEBDD",font=("Arial",9,"bold")))
+        txt_descricao[1].place(relx=0.5,rely=0.03,anchor="center")
+
+
         fr_cartaAtk_comum.append(tk.Frame(self.frame_tela_inicial,bg="#FDEBDD",width=140,height=171))
         fr_cartaAtk_comum[0].place(x=350,rely=0.89,anchor="center")
 
@@ -335,15 +347,18 @@ class MythWarriorsApp:
         self.fr_cartas_j1[0].place(relx=0.5,rely=0.5,anchor="center")
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[0],bg=self.fr_cartas_j1[0]["bg"],width=115,height=145))
         self.lbl_cartas_j1[0].place(relx=0.5,rely=0.5,anchor="center")
+
         self.importar_carta(0,self.jogador)
         self.btn_carta.append(tk.Button(self.fr_cartas_j1[0],text=f"F:{self.jogador.mao[0].forca}"))
         self.btn_carta[0].place(relx=0.5,rely=0.89,anchor="center")
-
+        
         #cartas magica
+
         self.fr_cartas_j1.append(tk.Frame(fr_cartaMagica[0],bg="white",width=115,height=145))
         self.fr_cartas_j1[1].place(relx=0.2,rely=0.5,anchor="center")
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[1],bg=self.fr_cartas_j1[1]["bg"],width=115,height=145))
         self.lbl_cartas_j1[1].place(relx=0.5,rely=0.5,anchor="center")
+
         self.importar_carta(1,self.jogador)
         self.btn_carta.append(tk.Button(self.fr_cartas_j1[1],text=f"F:{self.jogador.mao[1].forca}"))
         self.btn_carta[1].place(relx=0.5,rely=0.89,anchor="center")
@@ -352,6 +367,7 @@ class MythWarriorsApp:
         self.fr_cartas_j1[2].place(relx=0.5,rely=0.5,anchor="center")
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[2],bg=self.fr_cartas_j1[2]["bg"],width=115,height=145))
         self.lbl_cartas_j1[2].place(relx=0.5,rely=0.5,anchor="center")
+
         self.importar_carta(2,self.jogador)
         self.btn_carta.append(tk.Button(self.fr_cartas_j1[2],text=f"F:{self.jogador.mao[2].forca}"))
         self.btn_carta[2].place(relx=0.5,rely=0.89,anchor="center")
@@ -360,9 +376,39 @@ class MythWarriorsApp:
         self.fr_cartas_j1[3].place(relx=0.8,rely=0.5,anchor="center")
         self.lbl_cartas_j1.append(tk.Label(self.fr_cartas_j1[3],bg=self.fr_cartas_j1[3]["bg"],width=115,height=145))
         self.lbl_cartas_j1[3].place(relx=0.5,rely=0.5,anchor="center")
+
         self.importar_carta(3,self.jogador)
         self.btn_carta.append(tk.Button(self.fr_cartas_j1[3],text=f"F:{self.jogador.mao[3].forca}"))
         self.btn_carta[3].place(relx=0.5,rely=0.89,anchor="center")
+
+        #carta utilizada
+        self.cartas_utilizadas=[]
+        self.lbl_cartas_utilizadas=[]
+
+        self.cartas_utilizadas.append(tk.Frame(fr_carta_usada[0],bg="#FDEBDD",width=115,height=145))
+        self.cartas_utilizadas[0].place(relx=0.5,rely=0.5,anchor="center")
+        self.lbl_cartas_utilizadas.append(tk.Label(self.cartas_utilizadas[0],bg=self.cartas_utilizadas[0]["bg"],width=115,height=145))
+
+        self.cartas_utilizadas.append(tk.Frame(fr_carta_usada[1],bg="#FDEBDD",width=115,height=145))
+        self.cartas_utilizadas[1].place(relx=0.5,rely=0.5,anchor="center")
+        self.lbl_cartas_utilizadas.append(tk.Label(self.cartas_utilizadas[1],bg=self.cartas_utilizadas[1]["bg"],width=115,height=145))
+
+
+        if self.jogador.carta_utilizada != None:
+            self.importa_carta_usada(0,self.jogador)
+            self.lbl_cartas_utilizadas[0].place(relx=0.5,rely=0.5,anchor="center")
+        if self.computador.carta_utilizada != None:
+            self.importa_carta_usada(1,self.computador)
+            self.lbl_cartas_utilizadas[1].place(relx=0.5,rely=0.5,anchor="center")
+    
+    def importa_carta_usada(self,label,player):
+        img_carta = Image.open(f"{player.carta_utilizada.caminho_imagem}")
+        img_carta = img_carta.resize((115,145))
+        img_tk = ImageTk.PhotoImage(img_carta)
+
+        bg = tk.Label(self.lbl_cartas_utilizadas[label],image=img_tk)
+        bg.image = img_tk
+        bg.place(relx=0.5,rely=0.5,anchor="center")
 
     def importar_carta(self,label,player):
         #aqui está a configuração do background do menun inicial
@@ -393,6 +439,15 @@ class MythWarriorsApp:
         for p in self.lista_personagens:
             p.deck_poderes = random.sample(todos, k=10)
 
+    def exibir_narracao(self,txt_narracao):
+
+        self.fr_narracao = tk.Frame(self.frame_tela_inicial,bg="white",width=760,height=30)
+        self.fr_narracao.place(x=0,y=30,anchor="w")
+
+        txt_lbl_narracao = tk.Label(self.fr_narracao,bg="white",text=txt_narracao,font=("Arial",12,"bold"))
+        txt_lbl_narracao.place(relx=0.5,rely=0.5,anchor="center")
+
+
     def iniciarJogo(self,personagem_escolhido):
         self.jogador = personagem_escolhido
 
@@ -412,10 +467,28 @@ class MythWarriorsApp:
         self.computador.comprar_cartas()
 
         #fluxo principal do jogo
+
+
         self.redefinir()
         self.carregar_tabuleiro()
         #carrega hud dos jogadores
+
+        self.exibir_narracao("Começou o Jogo - 1º Turno (Vez do Jogador 1)")
+
+        self.fr_narracao.after(1000, lambda: self.exibir_narracao(" - "))
+
+
+        self.jogador.carta_utilizada = self.jogador.mao[2]
+        self.computador.carta_utilizada = self.computador.mao[0]
+
+
         self.carrega_HUD()
+
+        btn_pular_turno = tk.Button(self.frame_tela_inicial,text="Pular Turno")
+        btn_pular_turno.place(x=854,y=520,width=140,height=30)
+
+        btn_comprar_carta = tk.Button(self.frame_tela_inicial,text="Comprar Cartas(1)")
+        btn_comprar_carta.place(x=854,y=565,width=140,height=30)
 
 
 

@@ -39,6 +39,8 @@ class Personagem(ABC):
         
         # Mão atual (cartas disponíveis no turno)
         self.mao = []
+
+        self.carta_utilizada = None
         
         # Efeitos ativos no personagem (ex: Buff de defesa ativo por 2 turnos)
         self.efeitos_ativos = [] 
