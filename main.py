@@ -516,7 +516,7 @@ class MythWarriorsApp:
         Marca carta como utilizada em self.jogador.carta_utilizada,
         aplica um efeito simples (dano/cura/buff) e atualiza HUD.
         """
-        # obter carta do jogador (corrigido)
+        # obter carta do jogador 
         if slot_index == 0:
             carta = getattr(self.jogador, "ataque_comum", None)
         else:
@@ -550,7 +550,6 @@ class MythWarriorsApp:
             self.jogador.adicionar_efeito(carta)
             self.exibir_narracao(f"{self.jogador.nome} ativou {carta.nome}.")
         else:
-            # fallback
             dano = getattr(carta, "forca", 0)
             if dano:
                 self.computador.vida = max(0, getattr(self.computador, "vida", 0) - dano)
@@ -558,7 +557,7 @@ class MythWarriorsApp:
             else:
                 self.exibir_narracao(f"{self.jogador.nome} usou {carta.nome}.")
 
-        # limpar slot após uso
+                # limpar slot após uso
         if slot_index == 0:
             self.jogador.ataque_comum = None
         else:
@@ -566,16 +565,125 @@ class MythWarriorsApp:
             if idx < len(self.jogador.mao):
                 self.jogador.mao[idx] = None
 
+        # repor nova carta para o jogador no mesmo slot
+        self.repor_carta(self.jogador, slot_index)
+
         # atualizar HUD e checar fim de jogo
         self.carrega_HUD()
         if getattr(self.computador, "vida", 1) <= 0:
             self.exibir_narracao("Vitória! O computador foi derrotado.")
             self.acabouJogo = True
-
+        elif getattr(self.jogador, "vida", 1) <=0:
+            self.exibir_narracao("Derrota! O computador venceu!")
+            self.acabouJogo = True
 
 
     def pular_turno(self):
         self.turno_atual+=1
+
+    def computador_joga(self):
+        """
+        Lógica simples do computador:
+        - usa self.computador.ataque_comum se existir
+        - senão usa a primeira carta não-None em self.computador.mao
+        - aplica dano igual a carta.forca ao jogador (ou faz cura se tipo == 'CURA')
+        - marca computador.carta_utilizada e limpa o slot usado
+        - atualiza HUD e verifica fim de jogo
+        """
+        # pega carta do ataque comum primeiro
+        carta = getattr(self.computador, "ataque_comum", None)
+        usado_slot = 0  # 0 indica ataque_comum, 1..n para indices da mao (offset)
+        if carta is None:
+            mao = getattr(self.computador, "mao", [])
+            carta = None
+            for idx, c in enumerate(mao):
+                if c is not None:
+                    carta = c
+                    usado_slot = idx + 1
+                    break
+
+        if carta is None:
+            # nenhum movimento possível: passa
+            return
+
+        # marca carta utilizada
+        self.computador.carta_utilizada = carta
+
+        # aplicar efeito simples: se tipo for cura, curar; caso contrário aplica dano
+        tipo = getattr(carta, "tipo_efeito", None)
+        nome_tipo = None
+        try:
+            nome_tipo = tipo.name
+        except Exception:
+            nome_tipo = str(tipo)
+
+        if nome_tipo == "CURA":
+            cura = getattr(carta, "forca", 0)
+            self.computador.vida = min(100, getattr(self.computador, "vida", 0) + cura)
+        else:
+            # tratar como dano (fallback)
+            dano = getattr(carta, "forca", 0)
+            self.jogador.vida = max(0, getattr(self.jogador, "vida", 0) - dano)
+
+        # limpar slot usado
+        if usado_slot == 0:
+            self.computador.ataque_comum = None
+        else:
+            idx = usado_slot - 1
+            if idx < len(self.computador.mao):
+                self.computador.mao[idx] = None
+
+        # atualizar HUD
+        self.carrega_HUD()
+
+        # checar fim de jogo simples
+        if getattr(self.jogador, "vida", 1) <= 0:
+            # jogador derrotado
+            # apenas setar flag de fim de jogo; se você quiser exibir narracao, pode
+            self.acabouJogo = True
+
+    def repor_carta(self, player, slot_index):
+        """
+        Reponhe uma carta para `player` no slot indicado:
+        - slot_index == 0 -> repõe player.ataque_comum
+        - slot_index 1..3 -> repõe player.mao[slot_index-1]
+        A carta é escolhida aleatoriamente de player.deck_poderes (sem remover do deck).
+        Se o deck estiver vazio, não faz nada.
+        """
+        deck = getattr(player, "deck_poderes", None)
+        if not deck:
+            return  # nada a fazer se não houver deck
+
+        # escolhe uma carta aleatória do deck (sem remover)
+        nova = random.choice(deck) if len(deck) > 0 else None
+        if nova is None:
+            return
+
+        if slot_index == 0:
+            player.ataque_comum = nova
+        else:
+            idx = slot_index - 1
+            # garante que a mão tenha tamanho suficiente
+            mao = getattr(player, "mao", [])
+            # se índice já existe, substitui; se não, expande a lista até o índice e coloca
+            if idx < len(mao):
+                mao[idx] = nova
+            else:
+                # preenche com None até o índice desejado e adiciona
+                while len(mao) < idx:
+                    mao.append(None)
+                mao.append(nova)
+            player.mao = mao  # garante atributo atualizado
+
+        # se o player atual for o jogador visível, atualiza HUD
+        # (chamar carrega_HUD() fora também é ok; aqui é só segurança)
+        try:
+            if player is self.jogador or player is self.computador:
+                self.carrega_HUD()
+        except Exception:
+            pass
+
+
 
     def iniciarJogo(self,personagem_escolhido):
 
@@ -619,10 +727,22 @@ class MythWarriorsApp:
             self.exibir_narracao(f"Turno {self.turno_atual}")
 
             def on_pular():
-                self.pular_turno()              # incrementa turno
-                self.botao_pressionado.set(True)  # libera wait_variable
+                # jogador avança o turno (sua lógica existente)
+                self.pular_turno()  # incrementa turno do jogador
 
-            btn_pular_turno = tk.Button(self.frame_tela_inicial, text="Pular Turno", command=on_pular)
+                # opcional: você pode fazer verificações de turno/ações do jogador aqui
+
+                # agora computador joga imediatamente
+                try:
+                    self.computador_joga()
+                except Exception as e:
+                    # evita travar por erro inesperado do AI
+                    print("Erro na jogada do computador:", e)
+
+            # por fim, libera o wait_variable para que o loop recompile a UI e prossiga
+            self.botao_pressionado.set(True)
+
+            btn_pular_turno = tk.Button(self.frame_tela_inicial, text="Finalizar Turno", command=on_pular)
             btn_pular_turno.place(x=854, y=520, width=140, height=30)
 
             btn_comprar_carta = tk.Button(self.frame_tela_inicial, text="Comprar Cartas(1)")
