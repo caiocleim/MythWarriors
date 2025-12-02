@@ -641,6 +641,10 @@ class MythWarriorsApp:
             # jogador derrotado
             # apenas setar flag de fim de jogo; se você quiser exibir narracao, pode
             self.acabouJogo = True
+        elif getattr(self.computador, "vida", 1) <= 0:
+            # jogador derrotado
+            # apenas setar flag de fim de jogo; se você quiser exibir narracao, pode
+            self.acabouJogo = True
 
     def repor_carta(self, player, slot_index):
         """
